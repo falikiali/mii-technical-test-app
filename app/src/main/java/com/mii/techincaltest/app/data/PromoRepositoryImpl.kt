@@ -35,4 +35,27 @@ class PromoRepositoryImpl @Inject constructor(private val apiService: ApiService
             }
         }.flowOn(Dispatchers.IO)
     }
+
+    override suspend fun getPromoById(id: Int): Flow<ResultState<Promo>> {
+        return flow {
+            emit(ResultState.Loading)
+
+            try {
+                val response = apiService.getPromoById(id)
+                emit(ResultState.Success(response.data.toDomain()))
+            } catch (e: HttpException) {
+                e.response()?.errorBody().let {
+                    if (e.code() == 401) {
+                        emit(ResultState.Unauthorized)
+                    } else {
+                        emit(ResultState.ServerUnderMaintenance)
+                    }
+                }
+            } catch (e: IOException) {
+                emit(ResultState.ConnectionTimeout)
+            } catch (e: Exception) {
+                emit(ResultState.ServerUnderMaintenance)
+            }
+        }.flowOn(Dispatchers.IO)
+    }
 }

@@ -9,7 +9,7 @@ import com.mii.techincaltest.app.domain.model.Account
 data class AccountEntity(
     @PrimaryKey val id: String,
     @ColumnInfo("balance") val balance: Int,
-    @ColumnInfo("balance") val name: String
+    @ColumnInfo("name") val name: String
 ) {
     fun toDomain(): Account {
         return Account(id, balance, name)

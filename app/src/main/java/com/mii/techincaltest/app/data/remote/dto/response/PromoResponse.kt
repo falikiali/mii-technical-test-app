@@ -4,12 +4,12 @@ import com.google.gson.annotations.SerializedName
 import com.mii.techincaltest.app.domain.model.Promo
 
 data class PromoResponse(
-    val data: List<DataPromoResponse>
+    val data: DataPromoResponse
 )
 
 data class DataPromoResponse(
     val id: Int,
-    val attributes: AttributesDataPromoResponse
+    val attributes: AttributesDataPromosResponse
 ) {
     fun toDomain(): Promo {
         return Promo(

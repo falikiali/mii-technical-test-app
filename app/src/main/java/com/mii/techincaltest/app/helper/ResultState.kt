@@ -6,4 +6,5 @@ sealed class ResultState<out T: Any> {
     object ConnectionTimeout: ResultState<Nothing>()
     object ServerUnderMaintenance: ResultState<Nothing>()
     object Loading: ResultState<Nothing>()
+    object Idle: ResultState<Nothing>()
 }

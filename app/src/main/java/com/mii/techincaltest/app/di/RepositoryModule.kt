@@ -17,15 +17,12 @@ import dagger.hilt.components.SingletonComponent
 abstract class RepositoryModule {
 
     @Binds
-    @Provides
     abstract fun provideAccountRepository(accountRepositoryImpl: AccountRepositoryImpl): AccountRepository
 
     @Binds
-    @Provides
     abstract fun provideTransactionRepository(transactionRepositoryImpl: TransactionRepositoryImpl): TransactionRepository
 
     @Binds
-    @Provides
     abstract fun providePromoRepository(promoRepositoryImpl: PromoRepositoryImpl): PromoRepository
 
 }
