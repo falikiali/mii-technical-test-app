@@ -13,13 +13,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.mii.techincaltest.app.component.BarcodeScanner
 import com.mii.techincaltest.app.helper.Screens
 import com.mii.techincaltest.app.presentation.ConfirmPaymentScreen
 import com.mii.techincaltest.app.presentation.MainScreen
+import com.mii.techincaltest.app.presentation.promo.detail.DetailPromoScreen
 import com.mii.techincaltest.app.ui.theme.MIITechnicalTestAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -53,6 +56,20 @@ class MainActivity : ComponentActivity() {
                             route = Screens.ConfirmPayment.route
                         ) {
                             ConfirmPaymentScreen(navController = navController)
+                        }
+
+                        composable(
+                            route = Screens.DetailPromo.route + "/{id}",
+                            arguments = listOf(
+                                navArgument("id") { type = NavType.IntType }
+                            )
+                        ) {
+                            val id = it.arguments?.getInt("id", 0)
+
+                            DetailPromoScreen(
+                                navController = navController,
+                                id = id ?: 0
+                            )
                         }
                     }
                 }

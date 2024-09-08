@@ -17,21 +17,10 @@ class PromoViewModel @Inject constructor(private val promoRepository: PromoRepos
     private val _resultPromos = MutableLiveData<ResultState<List<Promo>>>(ResultState.Idle)
     val resultPromos: LiveData<ResultState<List<Promo>>> get() = _resultPromos
 
-    private val _resultPromo = MutableLiveData<ResultState<Promo>>(ResultState.Idle)
-    val resultPromo: LiveData<ResultState<Promo>> get() = _resultPromo
-
     fun getPromos() {
         viewModelScope.launch {
             promoRepository.getPromos().collect {
                 _resultPromos.postValue(it)
-            }
-        }
-    }
-
-    fun getPromoById(id: Int) {
-        viewModelScope.launch {
-            promoRepository.getPromoById(id).collect {
-                _resultPromo.postValue(it)
             }
         }
     }

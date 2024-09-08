@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,6 +24,7 @@ import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -47,6 +50,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.mii.techincaltest.app.R
 import com.mii.techincaltest.app.component.BarcodeScanner
 import com.mii.techincaltest.app.domain.model.Account
 import com.mii.techincaltest.app.domain.model.Transaction
@@ -66,44 +75,58 @@ fun HomeScreen(
     val resultHistoryTransaction by viewModel.resultHistoryTransaction.observeAsState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val composition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.lottie_loading))
+    val progress by animateLottieCompositionAsState(composition = composition, iterations = LottieConstants.IterateForever)
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getAccount()
         viewModel.getHistoryTransaction()
     }
 
-    Column(
-        modifier = modifier
-    ) {
-        HomeScreenAccountCard(
-            modifier = modifier,
-            account = resultAccount,
-            scope = scope,
-            barcodeScanner = barcodeScanner
-        ) { id, merchant, amount ->
-            if (amount <= resultAccount!!.balance) {
-                scope.launch {
-                    val result = viewModel.addNewTransaction(id, merchant, amount, resultAccount!!.balance)
-                    if (result.isSuccess) {
-                        navController.navigate(Screens.ConfirmPayment.route)
-                    } else {
-                        val exception = result.exceptionOrNull()
-
-                        if (exception is SQLiteConstraintException) {
-                            Toast.makeText(context, "Transaksi Anda kadaluwarsa", Toast.LENGTH_SHORT).show()
+    if (resultAccount != null) {
+        Column(
+            modifier = modifier
+        ) {
+            HomeScreenAccountCard(
+                modifier = modifier,
+                account = resultAccount,
+                scope = scope,
+                barcodeScanner = barcodeScanner
+            ) { id, merchant, amount ->
+                if (amount <= resultAccount!!.balance) {
+                    scope.launch {
+                        val result = viewModel.addNewTransaction(id, merchant, amount, resultAccount!!.balance)
+                        if (result.isSuccess) {
+                            navController.navigate(Screens.ConfirmPayment.route)
                         } else {
-                            Toast.makeText(context, "Transaksi gagal", Toast.LENGTH_SHORT).show()
+                            val exception = result.exceptionOrNull()
+
+                            if (exception is SQLiteConstraintException) {
+                                Toast.makeText(context, "Transaksi Anda kadaluwarsa", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(context, "Transaksi gagal", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
+                } else {
+                    Toast.makeText(context, "Saldo tidak cukup", Toast.LENGTH_SHORT).show()
                 }
-            } else {
-                Toast.makeText(context, "Saldo tidak cukup", Toast.LENGTH_SHORT).show()
+            }
+
+            if (resultHistoryTransaction?.isNotEmpty() == true) {
+                HomeScreenHistoryTransaction(historyTransaction = resultHistoryTransaction!!)
             }
         }
-
-        if (resultHistoryTransaction?.isNotEmpty() == true) {
-            HomeScreenHistoryTransaction(historyTransaction = resultHistoryTransaction!!)
-        }
+    } else {
+        LottieAnimation(
+            modifier = modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+            composition = composition,
+            progress = {
+                progress
+            }
+        )
     }
 }
 
