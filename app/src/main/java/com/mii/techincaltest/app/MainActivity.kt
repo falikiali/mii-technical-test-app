@@ -22,6 +22,7 @@ import com.mii.techincaltest.app.component.BarcodeScanner
 import com.mii.techincaltest.app.helper.Screens
 import com.mii.techincaltest.app.presentation.ConfirmPaymentScreen
 import com.mii.techincaltest.app.presentation.MainScreen
+import com.mii.techincaltest.app.presentation.portofolio.DetailPortofolioScreen
 import com.mii.techincaltest.app.presentation.promo.detail.DetailPromoScreen
 import com.mii.techincaltest.app.ui.theme.MIITechnicalTestAppTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -69,6 +70,20 @@ class MainActivity : ComponentActivity() {
                             DetailPromoScreen(
                                 navController = navController,
                                 id = id ?: 0
+                            )
+                        }
+
+                        composable(
+                            route = Screens.DetailPortofolio.route + "/{label}",
+                            arguments = listOf(
+                                navArgument("label") { type = NavType.StringType }
+                            )
+                        ) {
+                            val label = it.arguments?.getString("label", "")
+
+                            DetailPortofolioScreen(
+                                navController = navController,
+                                label = label ?: ""
                             )
                         }
                     }
